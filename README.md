@@ -52,11 +52,13 @@ Fix: added a dedicated "project structure overview" chunk during ingestion, gene
 ## Known limitations
 
 - `qwen2.5-coder:1.5b` is a small model — tool-routing occasionally fails and falls back to semantic search
-- No conversational memory yet (each question is independent)
+- **Follow-up questions with pronouns ("which file handles that?") are unreliable.** Initially, the tool router had no access to conversation history, so it searched for the literal word "that" and returned a confidently wrong file. After passing history into the router with an explicit instruction to resolve pronouns, the model's behavior improved from *confidently wrong* to *honestly uncertain* (it now says "I need more context" instead of guessing) — but it still can't reliably turn "that" into the right concrete search term. This appears to be a genuine capacity limit of a 1.5B parameter model doing multi-step reasoning (resolve pronoun → form search query), not a prompting bug. A larger model (7B+, or a hosted model like Claude/GPT) would likely handle this correctly.
 - Chunking is line-based, not AST-aware, so chunks can split functions awkwardly
 
 ## Roadmap
 
-- [ ] Add memory (multi-turn conversations)
+- [x] Add memory (multi-turn conversations)
+- [x] Multi-repo support (query across multiple projects, scoped or combined)
 - [ ] AST-aware chunking (split by function/class instead of fixed line counts)
 - [ ] Basic eval suite to measure retrieval and answer accuracy over time
+- [ ] Try a larger model to see if pronoun resolution in follow-ups improves
